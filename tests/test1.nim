@@ -1,3 +1,4 @@
+import options
 import unittest
 
 import gridtppkg/submodule
@@ -10,7 +11,7 @@ SELECT /wiki/cool-thing.gridml
   testCreateRequest = """
 #!/gridtp/1.0.0
 CREATE /wiki/cool-thing.gridml
-  """
+"""
 
 suite "Requests":
   test "Fails on incorrect header":
@@ -38,3 +39,17 @@ MEOW /softly
 
   test "Extracts path from the request":
     check parseRequest(testSelectRequest).path == "/wiki/cool-thing.gridml"
+
+  test "Body is none when there is no body":
+    check parseRequest(testCreateRequest).body.isNone
+
+  test "Throws error if body data type is invalid":
+    try:
+      discard parseRequest("""
+#!/gridtp/1.0.0
+CREATE /softly
+meow
+""")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "Invalid data type format for body."

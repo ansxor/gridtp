@@ -1,6 +1,7 @@
 import std/streams
 import std/strutils
 import std/options
+import std/sugar
 
 type
   GridAction* = enum
@@ -48,5 +49,19 @@ proc parseRequest*(input: string): GridRequest =
                       raise newException(ValueError, "Not a valid action.")
   result.path = actionAndPath[1]
 
+  let bodyType = try:
+                   some(stream.readLine())
+                 except:
+                   none(string)
+  if bodyType.isSome:
+    if not (bodyType.get.startsWith("#!/")):
+      raise newException(ValueError, "Invalid data type format for body.")
+    var
+      bodyArr = newSeq[string]()
+      line = ""
+    while stream.readLine(line):
+      bodyArr.add(line)
+    let body = bodyArr.join("\n")
+    result.body = some(GridBody(dataType: bodyType.get, data: body))
   
   discard
