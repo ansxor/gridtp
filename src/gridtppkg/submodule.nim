@@ -47,9 +47,21 @@ proc parseResponse*(input: string): GridResponse =
   
   if stream.atEnd():
     return
-  
-  let status = parseInt(stream.readLine())
-  result.status = GridStatus(status)
+
+  let line = stream.readLine()
+  # try to parse it being a body first
+  try:
+    let dataType = parseHeader(line)
+    var
+      bodyArr = newSeq[string]()
+      line = ""
+    while stream.readLine(line):
+      bodyArr.add(line)
+    let body = bodyArr.join("\n")
+    result.body = some(GridBody(dataType: dataType, data: body))
+  except ValueError:
+    let status = parseInt(line)
+    result.status = GridStatus(status)
 
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)

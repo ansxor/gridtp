@@ -1,0 +1,4 @@
+#+TITLE: GridTP Implementation in Nim
+
+This is a fantasy reimagining of the HTTP protocol based off of this conference presentation:
+https://www.youtube.com/watch?v=8JOD1AQGqEg
