@@ -2,6 +2,9 @@ import std/streams
 import std/strutils
 import std/options
 
+const
+  gridTpVersion = "gridtp/1.0.0"
+
 type
   GridAction* = enum
     Select
@@ -39,7 +42,7 @@ proc parseRequest*(input: string): GridRequest =
   
   let header = parseHeader(stream.readLine())
 
-  if header != "gridtp/1.0.0":
+  if header != gridTpVersion:
     raise newException(ValueError, "GridTP version is incompatible.")
   
   let actionAndPath = stream.readLine().splitWhitespace()
