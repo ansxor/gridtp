@@ -1,4 +1,5 @@
 import options
+import std/streams
 import unittest
 
 import gridtppkg/submodule
@@ -51,6 +52,14 @@ suite "Parse version header":
     except ValueError as e:
       check e.msg == "GridTP version is incompatible."
 
+suite "Reading body":
+  test "Body size must be larger than 0":
+    try:
+      discard readBody(newStringStream(""), 0)
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "Body size must be larger than 0"    
+      
 suite "Responses":
   test "Empty response":
     let response = parseResponse("""#!/gridtp/1.0.0

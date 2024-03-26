@@ -41,7 +41,12 @@ func parseVersionHeader*(header: string): string =
 
   if result != gridTpVersion:
     raise newException(ValueError, "GridTP version is incompatible.")
-      
+
+proc readBody*(stream: Stream, bodySize: uint): GridBody =
+  if bodySize == 0:
+    raise newException(ValueError, "Body size must be larger than 0")
+  discard
+    
 proc parseResponse*(input: string): GridResponse =
   var stream = newStringStream(input)
   discard parseVersionHeader(stream.readLine())
