@@ -23,6 +23,9 @@ message = "Hello friend"
 suite "Parse header":
   test "Check for gridtp header extraction":
     check parseHeader("#!/gridtp/1.0.0") == "gridtp/1.0.0"
+
+  test "Check for toml header extraction":
+    check parseHeader("#!/toml/1.0.0") == "toml/1.0.0"
   
 suite "Responses":
   discard

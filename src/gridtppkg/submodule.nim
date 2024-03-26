@@ -27,7 +27,9 @@ type
     body*: Option[GridBody]
 
 func parseHeader*(header: string): string =
-  return "gridtp/1.0.0"
+  if not (header.startsWith("#!/")):
+    raise newException(ValueError, "Invalid data type format for body.")
+  header.split("#!/")[1]
     
 proc parseResponse*(input: string): GridResponse =
   discard
