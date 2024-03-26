@@ -68,7 +68,7 @@ proc parseResponse*(input: string): GridResponse =
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)
   
-  let header = parseVersionHeader(stream.readLine())
+  discard parseVersionHeader(stream.readLine())
   
   let actionAndPath = stream.readLine().splitWhitespace()
 
