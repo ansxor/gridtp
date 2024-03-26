@@ -32,3 +32,13 @@ suite "Requests":
 
   test "Able to extract action from request (CREATE)":
     check parseRequest(testCreateRequest).action == Create
+
+  test "Fails on extraction action that doesn't exist":
+    try:
+      discard parseRequest("""
+#!/gridtp/1.0.0
+MEOW /softly
+""")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "Not a valid action."

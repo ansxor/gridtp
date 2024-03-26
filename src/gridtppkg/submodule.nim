@@ -23,9 +23,9 @@ proc parseRequest*(input: string): GridRequest =
   let actionAndPath = stream.readLine().splitWhitespace()
 
   if actionAndPath.len < 2:
-    raise newException(ValueError, "Not enough parameters specified for action and path")
+    raise newException(ValueError, "Not enough parameters specified for action and path.")
   elif actionAndPath.len > 2:
-    raise newException(ValueError, "Too many parameters specified for action and path")
+    raise newException(ValueError, "Too many parameters specified for action and path.")
 
   result.action = case actionAndPath[0].toUpper:
                     of "SELECT":
@@ -39,6 +39,6 @@ proc parseRequest*(input: string): GridRequest =
                     of "SUBMIT":
                       Submit
                     else:
-                      raise newException(ValueError, "Not a valid action")
+                      raise newException(ValueError, "Not a valid action.")
   
   discard
