@@ -53,7 +53,7 @@ suite "Parse version header":
       check e.msg == "GridTP version is incompatible."
 
 suite "Responses":
-  test "Empty respose":
+  test "Empty response":
     let response = parseResponse("#!/gridtp/1.0.0")
     check response.status == ValidRequest
     check response.body.isNone

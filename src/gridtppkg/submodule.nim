@@ -44,7 +44,12 @@ func parseVersionHeader*(header: string): string =
 proc parseResponse*(input: string): GridResponse =
   var stream = newStringStream(input)
   let header = parseVersionHeader(stream.readLine())
-  discard
+  
+  if stream.atEnd():
+    return
+  
+  let status = parseInt(stream.readLine())
+  result.status = GridStatus(status)
 
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)
