@@ -22,6 +22,7 @@ type
   GridBody* = object
     dataType*: string
     data*: string
+    size*: uint
   GridRequest* = object
     action*: GridAction
     path*: string
@@ -48,12 +49,18 @@ proc parseResponse*(input: string): GridResponse =
   if stream.atEnd():
     return
 
-  let check = stream.peekLine()
-  if check.all(isDigit):
-    let status = parseInt(stream.readLine())
-    result.status = GridStatus(status)
+  let
+    statusAndBodySize = stream.readLine().splitWhitespace()
   
-  if stream.atEnd():
+  if statusAndBodySize.len != 2:
+    raise newException(ValueError, "Incorrect amount of parameters for status and body size.")
+  
+  let
+    status = parseInt(statusAndBodySize[0])
+    bodySize = parseInt(statusAndBodySize[1])
+  result.status = GridStatus(status)
+  
+  if bodySize == 0:
     return
     
   let dataType = parseHeader(stream.readLine())
@@ -70,14 +77,14 @@ proc parseRequest*(input: string): GridRequest =
   
   discard parseVersionHeader(stream.readLine())
   
-  let actionAndPath = stream.readLine().splitWhitespace()
+  let actionPathAndBodySize = stream.readLine().splitWhitespace()
 
-  if actionAndPath.len < 2:
+  if actionPathAndBodySize.len < 3:
     raise newException(ValueError, "Not enough parameters specified for action and path.")
-  elif actionAndPath.len > 2:
+  elif actionPathAndBodySize.len > 3:
     raise newException(ValueError, "Too many parameters specified for action and path.")
 
-  result.action = case actionAndPath[0].toUpper:
+  result.action = case actionPathAndBodySize[0].toUpper:
                     of "SELECT":
                       Select
                     of "CREATE":
@@ -90,8 +97,12 @@ proc parseRequest*(input: string): GridRequest =
                       Submit
                     else:
                       raise newException(ValueError, "Not a valid action.")
-  result.path = actionAndPath[1]
+  result.path = actionPathAndBodySize[1]
+  let bodySize = parseInt(actionPathAndBodySize[2])
 
+  if bodySize == 0:
+    return
+  
   let bodyType = try:
                    some(stream.readLine())
                  except:

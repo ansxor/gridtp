@@ -6,15 +6,15 @@ import gridtppkg/submodule
 const
   testSelectRequest = """
 #!/gridtp/1.0.0
-SELECT /wiki/cool-thing.gridml
+SELECT /wiki/cool-thing.gridml 0
 """
   testCreateRequest = """
 #!/gridtp/1.0.0
-CREATE /wiki/cool-thing.gridml
+CREATE /wiki/cool-thing.gridml 0
 """
   testCreateWithBodyRequest = """
 #!/gridtp/1.0.0
-CREATE /wiki/cool-thing.gridml
+CREATE /wiki/cool-thing.gridml 57
 #!/toml/1.0.0
 email = "info@whatwhywhere.com"
 message = "Hello friend"
@@ -54,18 +54,28 @@ suite "Parse version header":
 
 suite "Responses":
   test "Empty response":
-    let response = parseResponse("#!/gridtp/1.0.0")
+    let response = parseResponse("""#!/gridtp/1.0.0
+0 0""")
     check response.status == ValidRequest
     check response.body.isNone
 
   test "Empty body with client error":
     let response = parseResponse("""#!/gridtp/1.0.0
-1""")
+1 0""")
     check response.status == ClientError
     check response.body.isNone
+
+  test "Incorrect parameters for status":
+    try:
+      discard parseResponse("""#!/gridtp/1.0.0
+0""")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "Incorrect amount of parameters for status and body size."
   
   test "Successful response with body":
     let response = parseResponse("""#!/gridtp/1.0.0
+0 91
 #!/gridml/1.0.0
 ~metadata{
   ~title(key){The Cool Thing}
@@ -78,7 +88,7 @@ suite "Responses":
   
   test "Response with status code and body":
     let response = parseResponse("""#!/gridtp/1.0.0
-1
+1 91
 #!/gridml/1.0.0
 ~metadata{
   ~title(key){The Cool Thing}
@@ -115,7 +125,7 @@ suite "Requests":
     try:
       discard parseRequest("""
 #!/gridtp/1.0.0
-MEOW /softly
+MEOW /softly 0
 """)
       assert false, "Failed to throw error"
     except ValueError as e:
@@ -131,7 +141,7 @@ MEOW /softly
     try:
       discard parseRequest("""
 #!/gridtp/1.0.0
-CREATE /softly
+CREATE /softly 4
 meow
 """)
       assert false, "Failed to throw error"
