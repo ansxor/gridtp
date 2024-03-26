@@ -1,6 +1,7 @@
 import std/streams
 import std/strutils
 import std/options
+import std/sequtils
 
 const
   gridTpVersion = "gridtp/1.0.0"
@@ -39,8 +40,7 @@ func parseVersionHeader*(header: string): string =
 
   if result != gridTpVersion:
     raise newException(ValueError, "GridTP version is incompatible.")
-  
-    
+      
 proc parseResponse*(input: string): GridResponse =
   var stream = newStringStream(input)
   let header = parseVersionHeader(stream.readLine())
@@ -48,20 +48,22 @@ proc parseResponse*(input: string): GridResponse =
   if stream.atEnd():
     return
 
-  let line = stream.readLine()
-  # try to parse it being a body first
-  try:
-    let dataType = parseHeader(line)
-    var
-      bodyArr = newSeq[string]()
-      line = ""
-    while stream.readLine(line):
-      bodyArr.add(line)
+  let check = stream.peekLine()
+  if check.all(isDigit):
+    let status = parseInt(stream.readLine())
+    result.status = GridStatus(status)
+  
+  if stream.atEnd():
+    return
+    
+  let dataType = parseHeader(stream.readLine())
+  var
+    bodyArr = newSeq[string]()
+    line = ""
+  while stream.readLine(line):
+    bodyArr.add(line)
     let body = bodyArr.join("\n")
     result.body = some(GridBody(dataType: dataType, data: body))
-  except ValueError:
-    let status = parseInt(line)
-    result.status = GridStatus(status)
 
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)

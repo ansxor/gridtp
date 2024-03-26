@@ -63,6 +63,7 @@ suite "Responses":
 1""")
     check response.status == ClientError
     check response.body.isNone
+  
   test "Successful response with body":
     let response = parseResponse("""#!/gridtp/1.0.0
 #!/gridml/1.0.0
@@ -75,6 +76,20 @@ suite "Responses":
     check response.status == ValidRequest
     check response.body.get.dataType == "gridml/1.0.0"
   
+  test "Response with status code and body":
+    let response = parseResponse("""#!/gridtp/1.0.0
+1
+#!/gridml/1.0.0
+~metadata{
+  ~title(key){The Cool Thing}
+}
+~document{
+  ~p{Let's grid this party started}
+}""")
+    check response.status == ClientError
+    check response.body.get.dataType == "gridml/1.0.0"
+
+    
 suite "Requests":
   test "Fails on incorrect version":
     try:
