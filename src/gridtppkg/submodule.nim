@@ -9,6 +9,12 @@ type
     Update
     Delete
     Submit
+  GridStatus* = enum
+    ValidRequest = 0
+    ClientError = 1
+    ServerError = 2
+    VersionMismatch = 3
+    Unknown
   GridBody* = object
     dataType*: string
     data*: string
@@ -16,7 +22,15 @@ type
     action*: GridAction
     path*: string
     body*: Option[GridBody]
+  GridResponse* = object
+    status*: GridStatus
+    body*: Option[GridBody]
 
+func parseHeader*(header: string): string =
+  return "gridtp/1.0.0"
+    
+proc parseResponse*(input: string): GridResponse =
+  discard
 
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)

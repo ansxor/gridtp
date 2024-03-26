@@ -20,6 +20,13 @@ email = "info@whatwhywhere.com"
 message = "Hello friend"
 """
 
+suite "Parse header":
+  test "Check for gridtp header extraction":
+    check parseHeader("#!/gridtp/1.0.0") == "gridtp/1.0.0"
+  
+suite "Responses":
+  discard
+  
 suite "Requests":
   test "Fails on incorrect header":
     try:
