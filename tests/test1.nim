@@ -12,6 +12,13 @@ SELECT /wiki/cool-thing.gridml
 #!/gridtp/1.0.0
 CREATE /wiki/cool-thing.gridml
 """
+  testCreateWithBodyRequest = """
+#!/gridtp/1.0.0
+CREATE /wiki/cool-thing.gridml
+#!/toml/1.0.0
+email = "info@whatwhywhere.com"
+message = "Hello friend"
+"""
 
 suite "Requests":
   test "Fails on incorrect header":
@@ -53,3 +60,6 @@ meow
       assert false, "Failed to throw error"
     except ValueError as e:
       check e.msg == "Invalid data type format for body."
+
+  test "Extracts correct data type format for body.":
+    check parseRequest(testCreateWithBodyRequest).body.get.dataType == "toml/1.0.0"
