@@ -44,7 +44,7 @@ func parseVersionHeader*(header: string): string =
       
 proc parseResponse*(input: string): GridResponse =
   var stream = newStringStream(input)
-  let header = parseVersionHeader(stream.readLine())
+  discard parseVersionHeader(stream.readLine())
   
   if stream.atEnd():
     return
@@ -115,10 +115,5 @@ proc parseRequest*(input: string): GridRequest =
                    parseHeader(bodyType.get)
                  except:
                    raise newException(ValueError, "Invalid data type format for body.")
-  var
-    bodyArr = newSeq[string]()
-    line = ""
-  while stream.readLine(line):
-    bodyArr.add(line)
-  let body = bodyArr.join("\n")
+  let body = stream.readStr(bodySize)
   result.body = some(GridBody(dataType: dataType, data: body))

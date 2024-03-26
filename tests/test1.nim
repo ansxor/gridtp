@@ -14,11 +14,10 @@ CREATE /wiki/cool-thing.gridml 0
 """
   testCreateWithBodyRequest = """
 #!/gridtp/1.0.0
-CREATE /wiki/cool-thing.gridml 57
+CREATE /wiki/cool-thing.gridml 56
 #!/toml/1.0.0
 email = "info@whatwhywhere.com"
-message = "Hello friend"
-"""
+message = "Hello friend""""
 
 suite "Parse header":
   test "Check for gridtp header extraction":
