@@ -35,6 +35,10 @@ suite "Parse header":
       check e.msg == "Data header format is invalid."
     
 suite "Responses":
+  test "Empty respose":
+    let response = parseResponse("#!/gridtp/1.0.0")
+    check response.status == ValidRequest
+    check response.body.isNone
   discard
   
 suite "Requests":
