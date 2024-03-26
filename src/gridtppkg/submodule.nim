@@ -22,7 +22,7 @@ type
   GridBody* = object
     dataType*: string
     data*: string
-    size*: uint
+    size*: int
   GridRequest* = object
     action*: GridAction
     path*: string
@@ -42,10 +42,16 @@ func parseVersionHeader*(header: string): string =
   if result != gridTpVersion:
     raise newException(ValueError, "GridTP version is incompatible.")
 
-proc readBody*(stream: Stream, bodySize: uint): GridBody =
+proc readBody*(stream: Stream, bodySize: int): GridBody =
   if bodySize == 0:
     raise newException(ValueError, "Body size must be larger than 0")
-  discard
+
+  result.size = bodySize
+  try:
+    result.dataType = parseHeader(stream.readLine())
+  except ValueError:
+    raise newException(ValueError, "Invalid data type format for body.")
+  result.data = stream.readStr(cast[int](bodySize))
     
 proc parseResponse*(input: string): GridResponse =
   var stream = newStringStream(input)
@@ -67,15 +73,8 @@ proc parseResponse*(input: string): GridResponse =
   
   if bodySize == 0:
     return
-    
-  let dataType = parseHeader(stream.readLine())
-  var
-    bodyArr = newSeq[string]()
-    line = ""
-  while stream.readLine(line):
-    bodyArr.add(line)
-    let body = bodyArr.join("\n")
-    result.body = some(GridBody(dataType: dataType, data: body))
+
+  result.body = some(readBody(stream, bodySize))
 
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)
@@ -107,18 +106,6 @@ proc parseRequest*(input: string): GridRequest =
 
   if bodySize == 0:
     return
-  
-  let bodyType = try:
-                   some(stream.readLine())
-                 except:
-                   none(string)
 
-  if bodyType.isNone:
-    return
-  
-  let dataType = try:
-                   parseHeader(bodyType.get)
-                 except:
-                   raise newException(ValueError, "Invalid data type format for body.")
-  let body = stream.readStr(bodySize)
-  result.body = some(GridBody(dataType: dataType, data: body))
+  let body = readBody(stream, bodySize)
+  result.body = some(body)

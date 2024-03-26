@@ -19,7 +19,11 @@ CREATE /wiki/cool-thing.gridml 56
 #!/toml/1.0.0
 email = "info@whatwhywhere.com"
 message = "Hello friend""""
-
+  testCreateBody = """#!/toml/1.0.0
+email = "info@whatwhywhere.com"
+message = "Hello friend""""
+  testCreateBodySize = 56
+  
 suite "Parse header":
   test "Check for gridtp header extraction":
     check parseHeader("#!/gridtp/1.0.0") == "gridtp/1.0.0"
@@ -53,12 +57,18 @@ suite "Parse version header":
       check e.msg == "GridTP version is incompatible."
 
 suite "Reading body":
+  test "Successfully extracts data type and body data":
+    let body = readBody(newStringStream(testCreateBody), testCreateBodySize)
+    check body.dataType == "toml/1.0.0"
+    check body.data == "email = \"info@whatwhywhere.com\"\nmessage = \"Hello friend\""
+    check body.size == testCreateBodySize
+  
   test "Body size must be larger than 0":
     try:
       discard readBody(newStringStream(""), 0)
       assert false, "Failed to throw error"
     except ValueError as e:
-      check e.msg == "Body size must be larger than 0"    
+      check e.msg == "Body size must be larger than 0"
       
 suite "Responses":
   test "Empty response":
