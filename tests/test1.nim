@@ -9,21 +9,26 @@ import unittest
 
 import gridtppkg/submodule
 
-
-test "correct welcome":
-  check getWelcomeMessage() == "Hello, World!"
-
-suite "Requests":
-  test "Able to extract action from request (SELECT)":
-    let testRequest = """
+const
+  testSelectRequest = """
 #!/gridtp/1.0.0
 SELECT /wiki/cool-thing.gridml
-  """
-    check parseRequest(testRequest).action == Select
-
-  test "Able to extract action from request (CREATE)":
-    let testRequest = """
+"""
+  testCreateRequest = """
 #!/gridtp/1.0.0
 CREATE /wiki/cool-thing.gridml
   """
-    check parseRequest(testRequest).action == Create
+
+suite "Requests":
+  test "Fails on incorrect header":
+    try:
+      discard parseRequest("meow")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "Header does not match correct format."
+    
+  test "Able to extract action from request (SELECT)":
+    check parseRequest(testSelectRequest).action == Select
+
+  test "Able to extract action from request (CREATE)":
+    check parseRequest(testCreateRequest).action == Create

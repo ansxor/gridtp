@@ -1,10 +1,4 @@
-# This is just an example to get you started. Users of your hybrid library will
-# import this file by writing ``import gridtppkg/submodule``. Feel free to rename or
-# remove this file altogether. You may create additional modules alongside
-# this file as required.
-
-proc getWelcomeMessage*(): string = "Hello, World!"
-
+import std/streams
 
 type
   GridAction* = enum
@@ -18,5 +12,13 @@ type
 
 
 proc parseRequest*(input: string): GridRequest =
+  var stream = newStringStream(input)
+  
+  let header = stream.readLine()
+
+  if header != "#!/gridtp/1.0.0":
+    raise newException(ValueError, "Header does not match correct format.")
+  
+  let actionAndPath = stream.readLine()
   
   discard
