@@ -63,3 +63,7 @@ meow
 
   test "Extracts correct data type format for body.":
     check parseRequest(testCreateWithBodyRequest).body.get.dataType == "toml/1.0.0"
+
+  test "Extracts correct data for body":
+    check parseRequest(testCreateWithBodyRequest).body.get.data == "email = \"info@whatwhywhere.com\"\nmessage = \"Hello friend\""
+    

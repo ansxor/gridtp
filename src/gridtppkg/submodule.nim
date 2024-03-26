@@ -52,17 +52,19 @@ proc parseRequest*(input: string): GridRequest =
                    some(stream.readLine())
                  except:
                    none(string)
-  if bodyType.isSome:
-    if not (bodyType.get.startsWith("#!/")):
-      raise newException(ValueError, "Invalid data type format for body.")
-    let
-      dataType = bodyType.get.split("#!/")[1]
-    var
-      bodyArr = newSeq[string]()
-      line = ""
-    while stream.readLine(line):
-      bodyArr.add(line)
-    let body = bodyArr.join("\n")
-    result.body = some(GridBody(dataType: dataType, data: body))
+
+  if bodyType.isNone:
+    return
   
-  discard
+  if not (bodyType.get.startsWith("#!/")):
+    raise newException(ValueError, "Invalid data type format for body.")
+  
+  let
+    dataType = bodyType.get.split("#!/")[1]
+  var
+    bodyArr = newSeq[string]()
+    line = ""
+  while stream.readLine(line):
+    bodyArr.add(line)
+  let body = bodyArr.join("\n")
+  result.body = some(GridBody(dataType: dataType, data: body))
