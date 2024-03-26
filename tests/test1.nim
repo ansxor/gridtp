@@ -33,13 +33,36 @@ suite "Parse header":
       assert false, "Failed to throw error"
     except ValueError as e:
       check e.msg == "Data header format is invalid."
+
+suite "Parse version header":
+  test "Correct version":
+    check parseVersionHeader("#!/gridtp/1.0.0") == "gridtp/1.0.0"
     
+  test "Incorrect format":
+    try:
+      discard parseHeader("meow")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "Data header format is invalid."
+  
+  test "Incorrect version":
+    try:
+      discard parseRequest("#!/gridtp/1.0.2")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "GridTP version is incompatible."
+
 suite "Responses":
   test "Empty respose":
     let response = parseResponse("#!/gridtp/1.0.0")
     check response.status == ValidRequest
     check response.body.isNone
-  discard
+
+  test "Empty body with client error":
+    let response = parseResponse("""#!/gridtp/1.0.0
+1""")
+    check response.status == ClientError
+    check response.body.isNone
   
 suite "Requests":
   test "Fails on incorrect version":

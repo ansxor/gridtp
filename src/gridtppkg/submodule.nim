@@ -33,17 +33,23 @@ func parseHeader*(header: string): string =
   if not (header.startsWith("#!/")):
     raise newException(ValueError, "Data header format is invalid.")
   header.split("#!/")[1]
+
+func parseVersionHeader*(header: string): string =
+  result = parseHeader(header)
+
+  if result != gridTpVersion:
+    raise newException(ValueError, "GridTP version is incompatible.")
+  
     
 proc parseResponse*(input: string): GridResponse =
+  var stream = newStringStream(input)
+  let header = parseVersionHeader(stream.readLine())
   discard
 
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)
   
-  let header = parseHeader(stream.readLine())
-
-  if header != gridTpVersion:
-    raise newException(ValueError, "GridTP version is incompatible.")
+  let header = parseVersionHeader(stream.readLine())
   
   let actionAndPath = stream.readLine().splitWhitespace()
 
