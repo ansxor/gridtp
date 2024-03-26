@@ -38,12 +38,19 @@ suite "Responses":
   discard
   
 suite "Requests":
+  test "Fails on incorrect version":
+    try:
+      discard parseRequest("#!/gridtp/1.0.2")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "GridTP version is incompatible."
+
   test "Fails on incorrect header":
     try:
       discard parseRequest("meow")
       assert false, "Failed to throw error"
     except ValueError as e:
-      check e.msg == "Header does not match correct format."
+      check e.msg == "Data header format is invalid."
     
   test "Extracts action from request (SELECT)":
     check parseRequest(testSelectRequest).action == Select

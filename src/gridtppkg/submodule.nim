@@ -37,10 +37,10 @@ proc parseResponse*(input: string): GridResponse =
 proc parseRequest*(input: string): GridRequest =
   var stream = newStringStream(input)
   
-  let header = stream.readLine()
+  let header = parseHeader(stream.readLine())
 
-  if header != "#!/gridtp/1.0.0":
-    raise newException(ValueError, "Header does not match correct format.")
+  if header != "gridtp/1.0.0":
+    raise newException(ValueError, "GridTP version is incompatible.")
   
   let actionAndPath = stream.readLine().splitWhitespace()
 
@@ -72,11 +72,10 @@ proc parseRequest*(input: string): GridRequest =
   if bodyType.isNone:
     return
   
-  if not (bodyType.get.startsWith("#!/")):
-    raise newException(ValueError, "Invalid data type format for body.")
-  
-  let
-    dataType = bodyType.get.split("#!/")[1]
+  let dataType = try:
+                   parseHeader(bodyType.get)
+                 except:
+                   raise newException(ValueError, "Invalid data type format for body.")
   var
     bodyArr = newSeq[string]()
     line = ""
