@@ -1,5 +1,6 @@
 import std/streams
 import std/strutils
+import std/options
 
 type
   GridAction* = enum
@@ -8,8 +9,13 @@ type
     Update
     Delete
     Submit
+  GridBody* = object
+    dataType*: string
+    data*: string
   GridRequest* = object
     action*: GridAction
+    path*: string
+    body*: Option[GridBody]
 
 
 proc parseRequest*(input: string): GridRequest =
@@ -40,5 +46,7 @@ proc parseRequest*(input: string): GridRequest =
                       Submit
                     else:
                       raise newException(ValueError, "Not a valid action.")
+  result.path = actionAndPath[1]
+
   
   discard
