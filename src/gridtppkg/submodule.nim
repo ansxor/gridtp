@@ -28,7 +28,7 @@ type
 
 func parseHeader*(header: string): string =
   if not (header.startsWith("#!/")):
-    raise newException(ValueError, "Invalid data type format for body.")
+    raise newException(ValueError, "Data header format is invalid.")
   header.split("#!/")[1]
     
 proc parseResponse*(input: string): GridResponse =

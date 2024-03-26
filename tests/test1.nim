@@ -26,7 +26,14 @@ suite "Parse header":
 
   test "Check for toml header extraction":
     check parseHeader("#!/toml/1.0.0") == "toml/1.0.0"
-  
+    
+  test "Check for error being thrown on bad header format":
+    try:
+      discard parseHeader("meow")
+      assert false, "Failed to throw error"
+    except ValueError as e:
+      check e.msg == "Data header format is invalid."
+    
 suite "Responses":
   discard
   
