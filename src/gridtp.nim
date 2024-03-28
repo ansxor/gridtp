@@ -1,5 +1,6 @@
 import std/net
 import std/socketstreams
+import std/strutils
 import std/mimetypes
 import std/paths
 import gridtppkg/submodule
@@ -22,13 +23,16 @@ when isMainModule:
       let gridReq = parseRequest(stream)
 
       if gridReq.action == Select:
+        var m = newMimetypes()
         let
           filePath = gridReq.path
           path = Path("static") / Path(filePath)
           file = readFile(string(path))
+          extension = file[file.rfind('.')+1..^1]
+          mimeType = m.getMimetype(extension)
         client.send(fmt"""#!/gridtp/1.0.0
 0 {file.len}
-#!/text
+#!/{mimeType}
 {file}""")
         echo "sent file: " & filePath
       else:
