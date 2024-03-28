@@ -1,5 +1,6 @@
 import std/asynchttpserver
 import std/asyncdispatch
+import std/streams
 import gridtppkg/submodule
 import strformat
 
@@ -9,7 +10,7 @@ proc main {.async.} =
   proc cb(req: Request) {.async.} =
     try:
       let body = req.body
-      let gridReq = parseRequest(body)
+      let gridReq = parseRequest(newStringStream(body))
       let returnBody = gridReq.path
       await req.respond(Http200, fmt"""#!/gridtp/1.0.0
 0 {returnBody.len}
