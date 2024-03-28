@@ -53,8 +53,7 @@ proc readBody*(stream: Stream, bodySize: int): GridBody =
     raise newException(ValueError, "Invalid data type format for body.")
   result.data = stream.readStr(cast[int](bodySize))
     
-proc parseResponse*(input: string): GridResponse =
-  var stream = newStringStream(input)
+proc parseResponse*(stream: Stream): GridResponse =
   discard parseVersionHeader(stream.readLine())
   
   if stream.atEnd():
@@ -76,9 +75,7 @@ proc parseResponse*(input: string): GridResponse =
 
   result.body = some(readBody(stream, bodySize))
 
-proc parseRequest*(input: string): GridRequest =
-  var stream = newStringStream(input)
-  
+proc parseRequest*(stream: Stream): GridRequest =
   discard parseVersionHeader(stream.readLine())
   
   let actionPathAndBodySize = stream.readLine().splitWhitespace()
