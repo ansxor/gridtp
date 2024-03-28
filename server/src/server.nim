@@ -3,7 +3,7 @@ import std/socketstreams
 import std/strutils
 import std/mimetypes
 import std/paths
-import gridtppkg/submodule
+import gridtp
 import strformat
 
 when isMainModule:

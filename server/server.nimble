@@ -2,11 +2,10 @@
 
 version       = "0.1.0"
 author        = "ansxor"
-description   = "GridTP: Grid Transfer Protocol. Alternative to HTTP inspired by SQL."
+description   = "GridTP Static File Server"
 license       = "GPL-3.0-or-later"
 srcDir        = "src"
-installExt    = @["nim"]
-bin           = @["gridtp"]
+bin           = @["server"]
 
 
 # Dependencies

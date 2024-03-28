@@ -2,7 +2,7 @@ import options
 import std/streams
 import unittest
 
-import gridtppkg/submodule
+import gridtp
 
 const
   testSelectRequest = """
