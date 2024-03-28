@@ -1,5 +1,7 @@
 import std/net
 import std/socketstreams
+import std/mimetypes
+import std/paths
 import gridtppkg/submodule
 import strformat
 
@@ -18,12 +20,20 @@ when isMainModule:
     var stream = newReadSocketStream(client)
     try:
       let gridReq = parseRequest(stream)
-      let returnBody = gridReq.path
-      client.send(fmt"""#!/gridtp/1.0.0
-0 {returnBody.len}
-#!/text
-{returnBody}""")
 
+      if gridReq.action == Select:
+        let
+          filePath = gridReq.path
+          path = Path("static") / Path(filePath)
+          file = readFile(string(path))
+        client.send(fmt"""#!/gridtp/1.0.0
+0 {file.len}
+#!/text
+{file}""")
+        echo "sent file: " & filePath
+      else:
+        client.send("""#!/gridtp/1.0.0
+1 0""")
     except ValueError as e:
       echo e.msg
       client.send("""#!/gridtp/1.0.0
