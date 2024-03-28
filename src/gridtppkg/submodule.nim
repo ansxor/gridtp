@@ -1,7 +1,6 @@
 import std/streams
 import std/strutils
 import std/options
-import std/sequtils
 
 const
   gridTpVersion = "gridtp/1.0.0"
@@ -52,24 +51,24 @@ proc readBody*(stream: Stream, bodySize: int): GridBody =
   except ValueError:
     raise newException(ValueError, "Invalid data type format for body.")
   result.data = stream.readStr(cast[int](bodySize))
-    
+
 proc parseResponse*(stream: Stream): GridResponse =
   discard parseVersionHeader(stream.readLine())
-  
+
   if stream.atEnd():
     return
 
   let
     statusAndBodySize = stream.readLine().splitWhitespace()
-  
+
   if statusAndBodySize.len != 2:
     raise newException(ValueError, "Incorrect amount of parameters for status and body size.")
-  
+
   let
     status = parseInt(statusAndBodySize[0])
     bodySize = parseInt(statusAndBodySize[1])
   result.status = GridStatus(status)
-  
+
   if bodySize == 0:
     return
 
@@ -77,7 +76,7 @@ proc parseResponse*(stream: Stream): GridResponse =
 
 proc parseRequest*(stream: Stream): GridRequest =
   discard parseVersionHeader(stream.readLine())
-  
+
   let actionPathAndBodySize = stream.readLine().splitWhitespace()
 
   if actionPathAndBodySize.len < 3:
@@ -86,18 +85,18 @@ proc parseRequest*(stream: Stream): GridRequest =
     raise newException(ValueError, "Too many parameters specified for action and path.")
 
   result.action = case actionPathAndBodySize[0].toUpper:
-                    of "SELECT":
-                      Select
-                    of "CREATE":
-                      Create
-                    of "UPDATE":
-                      Update
-                    of "DELETE":
-                      Delete
-                    of "SUBMIT":
-                      Submit
-                    else:
-                      raise newException(ValueError, "Not a valid action.")
+    of "SELECT":
+      Select
+    of "CREATE":
+      Create
+    of "UPDATE":
+      Update
+    of "DELETE":
+      Delete
+    of "SUBMIT":
+      Submit
+    else:
+      raise newException(ValueError, "Not a valid action.")
   result.path = actionPathAndBodySize[1]
   let bodySize = parseInt(actionPathAndBodySize[2])
 
