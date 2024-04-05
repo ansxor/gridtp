@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 module GridTP
+  GRIDTP_VERSION = 'gridtp/1.0.0'
+
+  class VersionError < RuntimeError
+    def initialize(msg='The version of GridTP in this message is incompatible')
+      super(msg)
+    end
+  end
+  
   class Body
     attr_accessor :data_type, :data, :size
 
@@ -25,6 +33,10 @@ module GridTP
       end
 
       header[PREPEND.length..-1].strip
+    end
+
+    def self.verify_version(version)
+      version == GridTP::GRIDTP_VERSION
     end
   end
 
